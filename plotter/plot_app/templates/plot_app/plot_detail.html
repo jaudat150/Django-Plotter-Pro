@@ -1,0 +1,116 @@
+{% extends 'plot_app/base.html' %}
+{% load humanize %}
+
+{% block title %}Plot #{{ plot.id }}{% endblock %}
+
+{% block content %}
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+        <h1 class="h4 mb-0">
+            <i class="fas fa-chart-line me-2"></i>{{ plot.title }}
+            <small class="ms-2">(ID: #{{ plot.id }})</small>
+        </h1>
+        <span class="badge bg-light text-dark fs-6">{{ plot.get_plot_type_display }}</span>
+    </div>
+    
+    <div class="card-body text-center">
+        <img src="{{ plot.image.url }}" class="img-fluid rounded shadow" alt="{{ plot.title }} plot">
+    </div>
+    
+    <div class="card-footer bg-light">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <span class="text-muted me-3">
+                    <i class="fas fa-calendar-alt me-1"></i> {{ plot.created_at|naturaltime }}
+                </span>
+                <span class="text-muted">
+                    <i class="fas fa-database me-1"></i> {{ plot.x_values|length }} data points
+                </span>
+            </div>
+            <div>
+                <a href="{% url 'plot_app:download_plot' plot.id %}" class="btn btn-success me-2">
+                    <i class="fas fa-download me-1"></i>Download PNG
+                </a>
+                <a href="{% url 'plot_app:home' %}" class="btn btn-outline-primary">
+                    <i class="fas fa-plus me-1"></i>Create Another Plot
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-info text-white">
+                <h2 class="h6 mb-0"><i class="fas fa-info-circle me-2"></i>Plot Details</h2>
+            </div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">
+                        <strong>X-axis:</strong> {{ plot.x_label }}
+                    </li>
+                    <li class="list-group-item">
+                        <strong>Y-axis:</strong> {{ plot.y_label }}
+                    </li>
+                    <li class="list-group-item">
+                        <strong>Created:</strong> {{ plot.created_at|date:"F j, Y, P" }}
+                    </li>
+                    <li class="list-group-item">
+                        <strong>Plot Type:</strong> {{ plot.get_plot_type_display }}
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-warning text-dark">
+                <h2 class="h6 mb-0"><i class="fas fa-sticky-note me-2"></i>Notes</h2>
+            </div>
+            <div class="card-body">
+                {% if plot.notes %}
+                    <p class="mb-0">{{ plot.notes|linebreaks }}</p>
+                {% else %}
+                    <p class="text-muted mb-0">No notes added for this plot.</p>
+                {% endif %}
+            </div>
+        </div>
+        
+        {% if plot.csv_file %}
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-secondary text-white">
+                <h2 class="h6 mb-0"><i class="fas fa-file-csv me-2"></i>CSV Source</h2>
+            </div>
+            <div class="card-body">
+                <a href="{{ plot.csv_file.url }}" class="btn btn-sm btn-outline-secondary">
+                    <i class="fas fa-download me-1"></i>Download CSV
+                </a>
+                <p class="mt-2 mb-0 small text-muted">
+                    Original CSV file used to generate this plot
+                </p>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-header bg-primary text-white">
+        <h2 class="h6 mb-0"><i class="fas fa-code me-2"></i>Raw Data</h2>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6 mb-3 mb-md-0">
+                <strong>X Values:</strong>
+                <pre class="bg-light p-3 rounded mt-2">{{ plot.x_data }}</pre>
+            </div>
+            <div class="col-md-6">
+                <strong>Y Values:</strong>
+                <pre class="bg-light p-3 rounded mt-2">{{ plot.y_data }}</pre>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

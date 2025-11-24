@@ -1,0 +1,17 @@
+# Virtual environment
+venv/
+.env
+
+# Python cache
+__pycache__/
+*.pyc
+
+# IDE
+.vscode/
+.idea/
+
+# Database & media
+db.sqlite3
+ 
+# Logs & temp
+*.log

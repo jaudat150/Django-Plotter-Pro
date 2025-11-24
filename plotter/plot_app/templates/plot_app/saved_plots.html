@@ -1,0 +1,99 @@
+{% extends 'plot_app/base.html' %}
+{% load humanize %}
+
+{% block title %}Saved Plots{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3 mb-0"><i class="fas fa-database me-2"></i>Saved Plots</h1>
+    <a href="{% url 'plot_app:home' %}" class="btn btn-primary">
+        <i class="fas fa-plus me-1"></i>Create New Plot
+    </a>
+</div>
+
+{% if plots %}
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+        {% for plot in plots %}
+            <div class="col">
+                <div class="card shadow-sm h-100 border-0">
+                    <div class="card-header bg-light border-bottom py-2">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h2 class="h6 mb-0">#{{ plot.id }} {{ plot.title }}</h2>
+                            <span class="badge bg-{{ plot.get_plot_type_display|lower }} text-white">
+                                {{ plot.get_plot_type_display|truncatechars:8 }}
+                            </span>
+                        </div>
+                    </div>
+                    <a href="{% url 'plot_app:plot_detail' plot.id %}" class="text-decoration-none text-dark">
+                        <div class="card-body text-center py-3">
+                            <img src="{{ plot.image.url }}" class="img-fluid rounded" alt="{{ plot.title }}" style="max-height: 200px; object-fit: contain;">
+                        </div>
+                    </a>
+                    <div class="card-footer bg-white border-top py-2">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <small class="text-muted">
+                                <i class="fas fa-clock me-1"></i> {{ plot.created_at|naturaltime }}
+                            </small>
+                            <div>
+                                <a href="{% url 'plot_app:plot_detail' plot.id %}" class="btn btn-sm btn-outline-primary me-1">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <a href="{% url 'plot_app:download_plot' plot.id %}" class="btn btn-sm btn-outline-success">
+                                    <i class="fas fa-download"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+    
+    {% if plots.paginator.num_pages > 1 %}
+    <nav class="mt-4">
+        <ul class="pagination justify-content-center">
+            {% if plots.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page=1">&laquo; First</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ plots.previous_page_number }}">Prev</a>
+                </li>
+            {% endif %}
+            
+            {% for num in plots.paginator.page_range %}
+                {% if plots.number == num %}
+                    <li class="page-item active">
+                        <span class="page-link">{{ num }} <span class="visually-hidden">(current)</span></span>
+                    </li>
+                {% elif num > plots.number|add:'-3' and num < plots.number|add:'3' %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                    </li>
+                {% endif %}
+            {% endfor %}
+            
+            {% if plots.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ plots.next_page_number }}">Next</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ plots.paginator.num_pages }}">Last &raquo;</a>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+{% else %}
+    <div class="text-center py-5">
+        <div class="mb-4">
+            <i class="fas fa-database fa-4x text-muted"></i>
+        </div>
+        <h2 class="h4 mb-3">No saved plots yet</h2>
+        <p class="text-muted mb-4">Create your first plot by entering data or uploading a CSV file</p>
+        <a href="{% url 'plot_app:home' %}" class="btn btn-primary btn-lg">
+            <i class="fas fa-plus me-2"></i>Create Your First Plot
+        </a>
+    </div>
+{% endif %}
+{% endblock %}
